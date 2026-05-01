@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { journalService } from '../services/api';
+import { JOURNALS } from '../data/journals'; // Import original data
 import JournalCard from '../features/journals/JournalCard';
 
 export default function Journals() {
@@ -14,17 +15,22 @@ export default function Journals() {
     try {
       setLoading(true);
       const data = await journalService.getAll();
-      // Map DB fields to what JournalCard expects
-      const mappedData = data.map(j => ({
-        id: j.journal_id,
-        image: j.image_url || '/placeholder-journal.jpg',
-        title: j.title,
-        blurb: j.description,
-        fieldEditor: j.editor_in_chief,
-        org: j.category,
-        sections: 0,
-        articles: 0
-      }));
+      
+      // Merge DB data with Static data (Fallbacks)
+      const mappedData = data.map(dbJ => {
+        const staticJ = JOURNALS.find(sj => sj.id === dbJ.journal_id);
+        
+        return {
+          id: dbJ.journal_id,
+          image: dbJ.image_url || staticJ?.image || '/placeholder-journal.jpg',
+          title: dbJ.title || staticJ?.title,
+          blurb: dbJ.description || staticJ?.blurb,
+          fieldEditor: dbJ.editor_in_chief || staticJ?.fieldEditor,
+          org: dbJ.category || staticJ?.org,
+          sections: staticJ?.sections || 0,
+          articles: staticJ?.articles || 0
+        };
+      });
       setJournals(mappedData);
     } catch (error) {
       console.error('Error fetching journals:', error);
