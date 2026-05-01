@@ -66,4 +66,19 @@ export const userService = {
     }
 };
 
+export const journalService = {
+    getAll: async () => {
+        const response = await api.get('/journals');
+        return response.data;
+    },
+    create: async (data) => {
+        const response = await api.post('/journals', data);
+        return response.data;
+    },
+    delete: async (id) => {
+        const response = await api.delete(`/journals/${id}`);
+        return response.data;
+    }
+};
+
 export default api;

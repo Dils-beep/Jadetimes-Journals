@@ -28,7 +28,9 @@ const AdminLayout = () => {
     const menuItems = [
         { name: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
         { name: 'Submissions', icon: FileText, path: '/admin/submissions' },
+        { name: 'Journals', icon: Settings, path: '/admin/journals' }, // Using Settings icon for now
         { name: 'Authors', icon: Users, path: '/admin/authors' },
+        { name: 'Users', icon: Users, path: '/admin/users' },
         { name: 'Settings', icon: Settings, path: '/admin/settings' },
     ];
 

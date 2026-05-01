@@ -1,8 +1,38 @@
-import React from 'react';
-import { JOURNALS } from '../data/journals';
+import React, { useState, useEffect } from 'react';
+import { journalService } from '../services/api';
 import JournalCard from '../features/journals/JournalCard';
 
 export default function Journals() {
+  const [journals, setJournals] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchJournals();
+  }, []);
+
+  const fetchJournals = async () => {
+    try {
+      setLoading(true);
+      const data = await journalService.getAll();
+      // Map DB fields to what JournalCard expects
+      const mappedData = data.map(j => ({
+        id: j.journal_id,
+        image: j.image_url || '/placeholder-journal.jpg',
+        title: j.title,
+        blurb: j.description,
+        fieldEditor: j.editor_in_chief,
+        org: j.category,
+        sections: 0,
+        articles: 0
+      }));
+      setJournals(mappedData);
+    } catch (error) {
+      console.error('Error fetching journals:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -15,13 +45,13 @@ export default function Journals() {
 
         <div className="max-w-4xl">
           <div className="flex flex-col">
-            {JOURNALS.map((journal) => (
+            {journals.map((journal) => (
               <JournalCard key={journal.id} j={journal} />
             ))}
           </div>
         </div>
         
-        {JOURNALS.length === 0 && (
+        {!loading && journals.length === 0 && (
           <div className="text-center py-20 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
             <p className="text-slate-500">No journals found in the catalog.</p>
           </div>

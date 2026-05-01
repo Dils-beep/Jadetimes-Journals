@@ -5,6 +5,7 @@ import { Users, Mail, Trash2, Shield, Layout, Clock, CheckCircle, AlertCircle } 
 
 const AdminUsers = () => {
     const [admins, setAdmins] = useState([]);
+    const [journals, setJournals] = useState([]); // Dynamic journals
     const [loading, setLoading] = useState(true);
     const [email, setEmail] = useState('');
     const [journalId, setJournalId] = useState('');
@@ -14,6 +15,7 @@ const AdminUsers = () => {
 
     useEffect(() => {
         fetchAdmins();
+        fetchJournals();
     }, []);
 
     const fetchAdmins = async () => {
@@ -26,6 +28,16 @@ const AdminUsers = () => {
             setMessage({ type: 'error', text: 'Failed to load admins.' });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchJournals = async () => {
+        try {
+            const { journalService } = await import('../../services/api');
+            const data = await journalService.getAll();
+            setJournals(data);
+        } catch (error) {
+            console.error('Error fetching journals:', error);
         }
     };
 
@@ -94,9 +106,11 @@ const AdminUsers = () => {
                             required
                         >
                             <option value="">Select Journal</option>
-                            <option value="universal">Universal Journal</option>
-                            <option value="medical">Medical Journal</option>
-                            <option value="engineering">Engineering Journal</option>
+                            {journals.map(journal => (
+                                <option key={journal.id} value={journal.journal_id}>
+                                    {journal.title}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div>

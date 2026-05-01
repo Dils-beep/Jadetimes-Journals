@@ -32,6 +32,7 @@ import AdminSubmissionDetails from "./pages/admin/AdminSubmissionDetails";
 import AdminAuthors from "./pages/admin/AdminAuthors";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminJournals from "./pages/admin/AdminJournals";
 
 // --- PAGES: JOURNALS ---
 import Journals from "./pages/Journals";
@@ -158,6 +159,7 @@ export default function App() {
             <Route path="authors" element={<AdminAuthors />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="journals" element={<AdminJournals />} />
           </Route>
 
           <Route
