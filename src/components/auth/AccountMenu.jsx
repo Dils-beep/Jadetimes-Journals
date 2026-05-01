@@ -5,7 +5,7 @@ import { UserIcon, ChevronDownIcon } from '../ui/Icons';
 
 const AccountMenu = ({ overlayMode }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const { user, logout } = useAuth();
+    const { user, profile, logout } = useAuth();
     const navigate = useNavigate();
     const menuRef = useRef(null);
 
@@ -68,6 +68,18 @@ const AccountMenu = ({ overlayMode }) => {
                         >
                             My Profile
                         </Link>
+
+                        {/* Admin Dashboard Link */}
+                        {(profile?.role === 'super_admin' || profile?.role === 'admin') && (
+                            <Link
+                                to="/admin"
+                                onClick={() => setIsOpen(false)}
+                                className="flex items-center px-6 py-3 text-sm font-bold text-blue-600 hover:bg-blue-50 transition-colors"
+                            >
+                                Dashboard
+                            </Link>
+                        )}
+
                         <Link
                             to="/submit-research/journal-of-universal-studies"
                             onClick={() => setIsOpen(false)}
