@@ -71,6 +71,10 @@ export const journalService = {
         const response = await api.get('/journals');
         return response.data;
     },
+    getById: async (id) => {
+        const response = await api.get(`/journals/${id}`);
+        return response.data;
+    },
     create: async (data) => {
         const response = await api.post('/journals', data);
         return response.data;
