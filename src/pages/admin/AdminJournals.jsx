@@ -126,6 +126,10 @@ const AdminJournals = () => {
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Category</label>
                                 <input type="text" placeholder="Science, Arts, etc." className="admin-input" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} />
                             </div>
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Cover Image URL</label>
+                                <input type="text" placeholder="https://..." className="admin-input" value={formData.image_url} onChange={(e) => setFormData({...formData, image_url: e.target.value})} />
+                            </div>
                         </div>
 
                         <div className="space-y-4 md:col-span-2">
