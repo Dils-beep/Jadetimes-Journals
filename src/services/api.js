@@ -79,6 +79,22 @@ export const journalService = {
         const response = await api.post('/journals', data);
         return response.data;
     },
+    uploadImage: async (file) => {
+        const formData = new FormData();
+        formData.append('image', file);
+        const response = await api.post('/journals/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        
+        let url = response.data.url;
+        // If the backend returns a relative URL like '/uploads/...', prepend the base URL
+        if (url.startsWith('/')) {
+            url = `${BASE_URL}${url}`;
+        }
+        return url;
+    },
     delete: async (id) => {
         const response = await api.delete(`/journals/${id}`);
         return response.data;

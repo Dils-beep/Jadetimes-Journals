@@ -7,6 +7,8 @@ const AdminJournals = () => {
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+    const [uploadingCover, setUploadingCover] = useState(false);
+    const [uploadingMemberImg, setUploadingMemberImg] = useState(false);
 
     const [formData, setFormData] = useState({
         journal_id: '',
@@ -37,6 +39,38 @@ const AdminJournals = () => {
             setMessage({ type: 'error', text: 'Failed to load journals.' });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCoverUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+            setUploadingCover(true);
+            const url = await journalService.uploadImage(file);
+            setFormData(prev => ({ ...prev, image_url: url }));
+        } catch (error) {
+            console.error('Error uploading cover:', error);
+            setMessage({ type: 'error', text: 'Failed to upload cover image.' });
+        } finally {
+            setUploadingCover(false);
+        }
+    };
+
+    const handleMemberImgUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            setUploadingMemberImg(true);
+            const url = await journalService.uploadImage(file);
+            setNewBoardMember(prev => ({ ...prev, image: url }));
+        } catch (error) {
+            console.error('Error uploading member image:', error);
+            setMessage({ type: 'error', text: 'Failed to upload member image.' });
+        } finally {
+            setUploadingMemberImg(false);
         }
     };
 
@@ -127,8 +161,10 @@ const AdminJournals = () => {
                                 <input type="text" placeholder="Science, Arts, etc." className="admin-input" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} />
                             </div>
                             <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Cover Image URL</label>
-                                <input type="text" placeholder="https://..." className="admin-input" value={formData.image_url} onChange={(e) => setFormData({...formData, image_url: e.target.value})} />
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Cover Image</label>
+                                <input type="file" accept="image/*" className="admin-input cursor-pointer" onChange={handleCoverUpload} disabled={uploadingCover} />
+                                {uploadingCover && <span className="text-xs text-blue-600 mt-1 inline-block">Uploading...</span>}
+                                {formData.image_url && <span className="text-xs text-emerald-600 mt-1 inline-block break-all">✓ Uploaded</span>}
                             </div>
                         </div>
 
@@ -166,7 +202,11 @@ const AdminJournals = () => {
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
                             <input type="text" placeholder="Name" className="admin-input-small" value={newBoardMember.name} onChange={e => setNewBoardMember({...newBoardMember, name: e.target.value})} />
                             <input type="text" placeholder="Role (e.g. Associate Editor)" className="admin-input-small" value={newBoardMember.role} onChange={e => setNewBoardMember({...newBoardMember, role: e.target.value})} />
-                            <input type="text" placeholder="Photo URL" className="admin-input-small" value={newBoardMember.image} onChange={e => setNewBoardMember({...newBoardMember, image: e.target.value})} />
+                            <div>
+                                <input type="file" accept="image/*" className="admin-input-small cursor-pointer" onChange={handleMemberImgUpload} disabled={uploadingMemberImg} />
+                                {uploadingMemberImg && <span className="text-[10px] text-blue-600 ml-1">Uploading...</span>}
+                                {newBoardMember.image && <span className="text-[10px] text-emerald-600 ml-1">✓ Uploaded</span>}
+                            </div>
                             <button type="button" onClick={addBoardMember} className="bg-slate-800 text-white rounded-lg px-4 py-2 hover:bg-black transition flex items-center justify-center gap-2 text-sm font-bold">
                                 <PlusCircle size={16} /> Add Member
                             </button>
