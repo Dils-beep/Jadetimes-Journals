@@ -26,6 +26,8 @@ const AdminSubmissionDetails = () => {
     const navigate = useNavigate();
     const [submission, setSubmission] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [rejectModalOpen, setRejectModalOpen] = useState(false);
+    const [feedback, setFeedback] = useState('');
 
     useEffect(() => {
         const fetchSubmission = async () => {
@@ -43,13 +45,17 @@ const AdminSubmissionDetails = () => {
         fetchSubmission();
     }, [id]);
 
-    const handleUpdateStatus = async (newStatus) => {
+    const handleUpdateStatus = async (newStatus, customFeedback = '') => {
         try {
-            await submissionService.updateStatus(id, newStatus);
+            await submissionService.updateStatus(id, newStatus, customFeedback);
             setSubmission(prev => ({
                 ...prev,
-                submission: { ...prev.submission, status: newStatus }
+                submission: { ...prev.submission, status: newStatus, feedback: customFeedback }
             }));
+            if (newStatus === 'rejected') {
+                setRejectModalOpen(false);
+                setFeedback('');
+            }
         } catch (error) {
             console.error("Failed to update status:", error);
             alert("Failed to update status.");
@@ -114,7 +120,7 @@ const AdminSubmissionDetails = () => {
                         <CheckCircle size={16} /> {subDetails.status === 'accepted' ? 'Accepted' : 'Accept'}
                     </button>
                     <button
-                        onClick={() => handleUpdateStatus('rejected')}
+                        onClick={() => setRejectModalOpen(true)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${subDetails.status === 'rejected'
                             ? 'bg-rose-500 text-white shadow-lg shadow-rose-200'
                             : 'bg-white text-rose-600 border border-rose-100 hover:bg-rose-50'
@@ -288,6 +294,35 @@ const AdminSubmissionDetails = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Reject Modal */}
+            {rejectModalOpen && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+                        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                <XCircle size={20} className="text-rose-500" />
+                                Reject Submission
+                            </h3>
+                            <button onClick={() => setRejectModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">✕</button>
+                        </div>
+                        <div className="p-6">
+                            <p className="text-sm text-slate-600 mb-4">Please provide feedback to the author explaining why this submission is being rejected or what changes are required for re-submission.</p>
+                            <textarea
+                                rows={5}
+                                value={feedback}
+                                onChange={(e) => setFeedback(e.target.value)}
+                                placeholder="Enter feedback for the author..."
+                                className="w-full p-3 border border-slate-200 rounded-xl focus:border-rose-500 focus:ring-2 focus:ring-rose-200 outline-none transition-all text-sm"
+                            ></textarea>
+                        </div>
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                            <button onClick={() => setRejectModalOpen(false)} className="px-5 py-2 text-sm font-bold text-slate-500 hover:bg-slate-200 rounded-xl transition-colors">Cancel</button>
+                            <button onClick={() => handleUpdateStatus('rejected', feedback)} disabled={!feedback.trim()} className="px-5 py-2 text-sm font-bold bg-rose-500 text-white hover:bg-rose-600 disabled:bg-rose-300 rounded-xl transition-colors shadow-lg shadow-rose-200">Confirm Rejection</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

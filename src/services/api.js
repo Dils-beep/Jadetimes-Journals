@@ -37,12 +37,20 @@ export const submissionService = {
         const response = await api.post('/submissions', formData);
         return response.data;
     },
-    updateStatus: async (id, status) => {
-        const response = await api.put(`/submissions/${id}/status`, { status });
+    updateStatus: async (id, status, feedback = '') => {
+        const response = await api.put(`/submissions/${id}/status`, { status, feedback });
         return response.data;
     },
     delete: async (id) => {
         const response = await api.delete(`/submissions/${id}`);
+        return response.data;
+    },
+    getMySubmissions: async () => {
+        const response = await api.get('/submissions/user/my-submissions');
+        return response.data;
+    },
+    reupload: async (id, formData) => {
+        const response = await api.post(`/submissions/${id}/reupload`, formData);
         return response.data;
     }
 };
