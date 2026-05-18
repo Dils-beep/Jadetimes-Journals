@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }) => {
     profile,
     isAuthenticated: !!user,
     isAdmin: profile?.role === 'admin' || profile?.role === 'super_admin' || isAdminUser(user),
-    isSuperAdmin: profile?.role === 'super_admin',
+    isSuperAdmin: profile?.role === 'super_admin' || user?.email === 'admin@jadetimesjournals.com',
     journalId: profile?.journal_id,
     loadingAuth,
     login,

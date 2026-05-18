@@ -158,8 +158,8 @@ export default function App() {
             <Route path="submissions/:id" element={<AdminSubmissionDetails />} />
             <Route path="authors" element={<AdminAuthors />} />
             <Route path="settings" element={<AdminSettings />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="journals" element={<AdminJournals />} />
+            <Route path="users" element={<AdminRoute requireSuperAdmin={true}><AdminUsers /></AdminRoute>} />
+            <Route path="journals" element={<AdminRoute requireSuperAdmin={true}><AdminJournals /></AdminRoute>} />
           </Route>
 
           <Route

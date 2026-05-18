@@ -2,8 +2,8 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
-const AdminRoute = ({ children }) => {
-    const { user, isAdmin, loadingAuth } = useAuth();
+const AdminRoute = ({ children, requireSuperAdmin = false }) => {
+    const { user, isAdmin, isSuperAdmin, loadingAuth } = useAuth();
     const location = useLocation();
 
     if (loadingAuth) {
@@ -22,6 +22,11 @@ const AdminRoute = ({ children }) => {
     if (!isAdmin) {
         // Redirect to home if logged in but not an admin
         return <Navigate to="/" replace />;
+    }
+
+    if (requireSuperAdmin && !isSuperAdmin) {
+        // Redirect to admin dashboard if they try to access super admin areas
+        return <Navigate to="/admin" replace />;
     }
 
     return children;

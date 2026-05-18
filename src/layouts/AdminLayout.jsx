@@ -16,7 +16,7 @@ import {
 
 const AdminLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const { logout, user } = useAuth();
+    const { logout, user, isSuperAdmin } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -25,14 +25,16 @@ const AdminLayout = () => {
         navigate('/admin-login');
     };
 
-    const menuItems = [
+    const allMenuItems = [
         { name: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
         { name: 'Submissions', icon: FileText, path: '/admin/submissions' },
-        { name: 'Journals', icon: Settings, path: '/admin/journals' }, // Using Settings icon for now
+        { name: 'Journals', icon: Settings, path: '/admin/journals', superAdminOnly: true }, 
         { name: 'Authors', icon: Users, path: '/admin/authors' },
-        { name: 'Users', icon: Users, path: '/admin/users' },
+        { name: 'Users', icon: Users, path: '/admin/users', superAdminOnly: true },
         { name: 'Settings', icon: Settings, path: '/admin/settings' },
     ];
+
+    const menuItems = allMenuItems.filter(item => !item.superAdminOnly || isSuperAdmin);
 
     return (
         <div className="min-h-screen bg-slate-50 flex">
