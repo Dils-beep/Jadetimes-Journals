@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router-dom';
-import { submissionService } from '../services/api';
+import { Link, useParams } from 'react-router-dom';
+import { submissionService, journalService } from '../services/api';
 
 const STEPS = [
     { id: 1, label: 'Details' },
@@ -13,6 +13,8 @@ const STEPS = [
 
 const SubmitResearch = () => {
     const { user } = useAuth();
+    const { journalId } = useParams();
+    const [journalTitle, setJournalTitle] = useState(journalId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
     const [currentStep, setCurrentStep] = useState(0); // 0 is the "Make a Submission" start page
     const [lastSaved, setLastSaved] = useState(null);
     const fileInputRef = useRef(null);
@@ -47,7 +49,19 @@ const SubmitResearch = () => {
 
     // Load draft on mount
     useEffect(() => {
-        const draft = localStorage.getItem('jt_submission_draft_jjus');
+        const fetchJournalTitle = async () => {
+            try {
+                const journal = await journalService.getById(journalId);
+                if (journal && journal.title) {
+                    setJournalTitle(journal.title);
+                }
+            } catch (err) {
+                console.error("Failed to fetch journal title");
+            }
+        };
+        fetchJournalTitle();
+
+        const draft = localStorage.getItem(`jt_submission_draft_${journalId}`);
         if (draft) {
             try {
                 const parsed = JSON.parse(draft);
@@ -58,7 +72,7 @@ const SubmitResearch = () => {
                 console.error("Failed to parse draft", e);
             }
         }
-    }, []);
+    }, [journalId]);
 
     // Also add the user as default contributor if empty
     useEffect(() => {
@@ -79,7 +93,7 @@ const SubmitResearch = () => {
 
     const saveDraft = () => {
         const now = new Date();
-        localStorage.setItem('jt_submission_draft_jjus', JSON.stringify({
+        localStorage.setItem(`jt_submission_draft_${journalId}`, JSON.stringify({
             data: formData,
             lastSaved: now.toISOString()
         }));
@@ -187,7 +201,7 @@ const SubmitResearch = () => {
             uploadData.append('privacyAgreed', formData.privacyAgreed);
             uploadData.append('contributors', JSON.stringify(formData.contributors));
             uploadData.append('funders', JSON.stringify(formData.funders));
-            uploadData.append('journalId', 'journal-of-universal-studies'); // Default to the current journal
+            uploadData.append('journalId', journalId);
 
             // Add actual files
             rawFiles.forEach(file => {
@@ -197,7 +211,7 @@ const SubmitResearch = () => {
             await submissionService.create(uploadData);
 
             // Clear draft
-            localStorage.removeItem('jt_submission_draft_jjus');
+            localStorage.removeItem(`jt_submission_draft_${journalId}`);
 
             // Go to success page
             setCurrentStep(6);
@@ -225,7 +239,7 @@ const SubmitResearch = () => {
     const Header = () => (
         <div className="bg-[#002b45] text-white py-3 px-4 flex items-center justify-between text-sm">
             <div className="flex items-center gap-4">
-                <span className="font-bold">Journal of Universal Studies</span>
+                <span className="font-bold">{journalTitle}</span>
                 <Link to="/submissions" className="text-gray-300 hover:underline">← Back to Submissions</Link>
             </div>
             <div className="flex items-center gap-6">

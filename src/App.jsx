@@ -163,7 +163,7 @@ export default function App() {
           </Route>
 
           <Route
-            path="submit-research/journal-of-universal-studies"
+            path="submit-research/:journalId"
             element={
               <ProtectedRoute>
                 <SubmitResearch />
