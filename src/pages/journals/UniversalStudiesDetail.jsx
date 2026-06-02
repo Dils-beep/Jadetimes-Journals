@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, NavLink } from 'react-router-dom';
 import { JOURNALS } from '../../data/journals';
 import { UNIVERSAL_STUDIES_DATA } from '../../data/journalUniversalStudies';
@@ -86,7 +86,7 @@ export default function JournalDetail({ journalId: propJournalId }) {
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
                 {data.about.areasCovered.map((area, idx) => (
                   <li key={idx} className="flex items-start text-gray-700 text-[15px] group">
-                    <span className="text-blue-500 mr-3 mt-1 text-lg leading-none group-hover:scale-125 transition-transform">ΓÇó</span> 
+                    <span className="text-blue-500 mr-3 mt-1 text-lg leading-none group-hover:scale-125 transition-transform">•</span> 
                     <span className="leading-snug">{area}</span>
                   </li>
                 ))}
