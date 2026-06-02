@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { journalService } from '../../services/api';
 import { UNIVERSAL_STUDIES_DATA } from '../../data/journalUniversalStudies';
 import { ChevronRight, FileText, User, Quote, BookOpen, Star } from 'lucide-react';
+import UniversalStudiesDetail from './UniversalStudiesDetail';
 
 export default function JournalDetail({ journalId: propJournalId }) {
     const { id } = useParams();
@@ -13,6 +14,11 @@ export default function JournalDetail({ journalId: propJournalId }) {
     const [activeTab, setActiveTab] = useState('Most recent');
 
     useEffect(() => {
+        if (journalId === "journal-of-universal-studies" || journalId === "universal-studies") {
+            setLoading(false);
+            return;
+        }
+
         const fetchJournal = async () => {
             try {
                 setLoading(true);
@@ -26,6 +32,10 @@ export default function JournalDetail({ journalId: propJournalId }) {
         };
         fetchJournal();
     }, [journalId]);
+
+    if (journalId === "journal-of-universal-studies" || journalId === "universal-studies") {
+        return <UniversalStudiesDetail journalId={journalId} />;
+    }
 
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center italic text-slate-400">Loading journal data...</div>;
