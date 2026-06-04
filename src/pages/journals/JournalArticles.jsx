@@ -11,9 +11,9 @@ export default function JournalArticles() {
 
   // Filter articles for this journal
   // Note: some articles might use journal title instead of ID, handle both
-  const journalArticles = ARTICLES.filter(a => 
-    a.journalId === journalId || 
-    a.journal === journal?.title || 
+  const journalArticles = ARTICLES.filter(a =>
+    a.journalId === journalId ||
+    a.journal === journal?.title ||
     (journalId === "journal-of-universal-studies" && (a.journal?.includes("Universal Studies") || a.journalTitle?.includes("Universal Studies")))
   );
 
@@ -53,21 +53,21 @@ export default function JournalArticles() {
 
       <div className="max-w-7xl mx-auto px-6 py-16 md:py-24">
         <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-12">
-            <h2 className="text-2xl font-bold text-slate-900">{journalArticles.length} Published Articles</h2>
-            <div className="flex gap-4">
-                <select className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>Most Recent First</option>
-                    <option>Most Viewed</option>
-                    <option>Oldest First</option>
-                </select>
-            </div>
+          <h2 className="text-2xl font-bold text-slate-900">{journalArticles.length} Published Articles</h2>
+          <div className="flex gap-4">
+            <select className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option>Most Recent First</option>
+              <option>Most Viewed</option>
+              <option>Oldest First</option>
+            </select>
+          </div>
         </div>
 
         <div className="space-y-8 max-w-5xl">
           {journalArticles.length > 0 ? (
             journalArticles.map((article) => (
-              <Link 
-                key={article.id} 
+              <Link
+                key={article.id}
                 to={article.journalId === "journal-of-universal-studies" || article.journalTitle?.includes("Universal Studies") ? `/journal-of-universal-studies/articles/${article.id}` : `/articles/${article.id}`}
                 className="block group"
               >
@@ -77,32 +77,32 @@ export default function JournalArticles() {
                       {article.kind}
                     </span>
                     <span className="flex items-center text-slate-400 text-xs">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {article.published}
+                      <Clock className="w-3 h-3 mr-1" />
+                      {article.published}
                     </span>
                     <span className="text-slate-400 text-xs">•</span>
                     <span className="text-blue-600 text-xs font-semibold">{article.section}</span>
                   </div>
-                  
+
                   <h3 className="text-2xl font-bold text-slate-900 mb-4 font-serif leading-tight group-hover:text-blue-600 transition-colors">
                     {article.title}
                   </h3>
-                  
+
                   <p className="text-slate-500 text-sm mb-6 line-clamp-2 leading-relaxed">
                     {article.authors.map(a => a.name).join(', ')}
                   </p>
-                  
+
                   <div className="flex items-center justify-between pt-6 border-t border-slate-50">
                     <div className="flex items-center gap-6">
-                        <span className="text-slate-400 text-xs">
-                            <span className="text-slate-900 font-bold">{article.metrics?.views || 0}</span> Views
-                        </span>
-                        <span className="text-slate-400 text-xs">
-                            <span className="text-slate-900 font-bold">0</span> Citations
-                        </span>
+                      <span className="text-slate-400 text-xs">
+                        <span className="text-slate-900 font-bold">{article.metrics?.views || 0}</span> Views
+                      </span>
+                      <span className="text-slate-400 text-xs">
+                        <span className="text-slate-900 font-bold">0</span> Citations
+                      </span>
                     </div>
                     <span className="text-blue-600 font-bold flex items-center group-hover:translate-x-1 transition-transform">
-                        Read Article <ChevronRight className="w-4 h-4 ml-1" />
+                      Read Article <ChevronRight className="w-4 h-4 ml-1" />
                     </span>
                   </div>
                 </article>

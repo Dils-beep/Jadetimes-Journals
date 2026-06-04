@@ -48,6 +48,10 @@ import Volume1 from "./pages/journals/Volume1";
 import Articles from "./pages/Articles";
 import ArticleDetail from "./pages/articles/ArticleDetail";
 
+// --- PAGES: SUBMISSIONS (PUBLIC) ---
+import SubmissionPublicView from "./pages/submissions/SubmissionPublicView";
+import SubmissionPaperView from "./pages/submissions/SubmissionPaperView";
+
 // --- PAGES: ABOUT US ---
 import Mission from "./pages/about/Mission";
 import History from "./pages/about/History";
@@ -210,7 +214,13 @@ export default function App() {
             <Route index element={<Journals />} />
             <Route path=":id" element={<JournalDetail />} />
             <Route path=":id/about" element={<JournalAbout />} />
+            <Route path=":id/articles" element={<JournalArticles />} />
+            <Route path=":id/editors" element={<JournalEditors />} />
           </Route>
+
+          {/* Published Submission Routes (Public) */}
+          <Route path="submissions/:submissionId" element={<SubmissionPublicView />} />
+          <Route path="paper-view/:submissionId" element={<SubmissionPaperView />} />
 
           {/* 3. Articles Structure */}
           <Route path="articles" element={<Articles />} />

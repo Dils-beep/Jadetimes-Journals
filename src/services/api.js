@@ -52,6 +52,11 @@ export const submissionService = {
     reupload: async (id, formData) => {
         const response = await api.post(`/submissions/${id}/reupload`, formData);
         return response.data;
+    },
+    getAcceptedByJournal: async (journalId) => {
+        // Public endpoint - no auth needed
+        const response = await axios.get(`${API_BASE_URL}/submissions/public/${journalId}`);
+        return response.data;
     }
 };
 
