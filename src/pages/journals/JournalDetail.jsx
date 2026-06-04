@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { journalService } from '../../services/api';
+import { journalService, submissionService } from '../../services/api';
 import { UNIVERSAL_STUDIES_DATA } from '../../data/journalUniversalStudies';
 import { ChevronRight, FileText, User, Quote, BookOpen, Star } from 'lucide-react';
 import UniversalStudiesDetail from './UniversalStudiesDetail';
@@ -12,6 +12,7 @@ export default function JournalDetail({ journalId: propJournalId }) {
     const [journal, setJournal] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('Most recent');
+    const [acceptedPapers, setAcceptedPapers] = useState([]);
 
     useEffect(() => {
         if (journalId === "journal-of-universal-studies" || journalId === "universal-studies") {
@@ -22,8 +23,12 @@ export default function JournalDetail({ journalId: propJournalId }) {
         const fetchJournal = async () => {
             try {
                 setLoading(true);
-                const data = await journalService.getById(journalId);
+                const [data, papersData] = await Promise.all([
+                    journalService.getById(journalId),
+                    submissionService.getAcceptedByJournal(journalId).catch(() => [])
+                ]);
                 setJournal(data);
+                setAcceptedPapers(papersData);
             } catch (error) {
                 console.error('Error fetching journal:', error);
             } finally {
@@ -142,6 +147,52 @@ export default function JournalDetail({ journalId: propJournalId }) {
                     </div>
                 </div>
             </section>
+
+            {/* RECENTLY ACCEPTED PAPERS */}
+            {acceptedPapers && acceptedPapers.length > 0 && (
+                <section className="bg-white py-24 border-t border-slate-100">
+                    <div className="max-w-7xl mx-auto px-6">
+                        <div className="flex items-center gap-3 mb-12">
+                            <FileText className="text-blue-600" />
+                            <h2 className="text-4xl font-bold text-gray-900 font-serif underline decoration-blue-500/30 underline-offset-8">Recently Accepted Papers</h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {acceptedPapers.slice(0, 4).map((paper) => (
+                                <Link key={paper.id} to={`/submissions/${paper.id}`} className="block group">
+                                    <article className="bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-sm group-hover:shadow-xl transition-all group-hover:border-blue-200 group-hover:-translate-y-1">
+                                        <div className="flex flex-wrap items-center gap-3 mb-3">
+                                            <span className="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-widest rounded-full">
+                                                Accepted Submission
+                                            </span>
+                                            {paper.status === 'pending' && (
+                                                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-[10px] font-bold uppercase tracking-widest rounded-full">
+                                                    Under Review
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
+                                            {paper.title}
+                                        </h3>
+                                        <p className="text-slate-500 text-sm mb-4 line-clamp-3">
+                                            {paper.abstract}
+                                        </p>
+                                        <div className="text-blue-600 font-bold flex items-center text-sm">
+                                            View Abstract & Download <ChevronRight className="w-4 h-4 ml-1" />
+                                        </div>
+                                    </article>
+                                </Link>
+                            ))}
+                        </div>
+                        {acceptedPapers.length > 4 && (
+                            <div className="mt-12 text-center">
+                                <Link to={`/journals/${journal.journal_id}/articles`} className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 px-8 py-3 rounded-full font-bold transition-colors">
+                                    View All Articles <ChevronRight className="w-4 h-4" />
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            )}
 
             {/* 3. EDITORIAL BOARD */}
             {editorialBoard.length > 0 && (

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { submissionService } from '../../services/api';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
@@ -25,37 +26,25 @@ const AdminDashboard = () => {
     const [recentSubmissions, setRecentSubmissions] = useState([]);
 
     useEffect(() => {
-        const data = JSON.parse(localStorage.getItem('jt_submissions') || '[]');
+        const fetchDashboardData = async () => {
+            try {
+                const data = await submissionService.getAll();
+                
+                const counts = data.reduce((acc, sub) => {
+                    acc.total++;
+                    const status = sub.status || 'pending';
+                    acc[status] = (acc[status] || 0) + 1;
+                    return acc;
+                }, { total: 0, pending: 0, accepted: 0, rejected: 0 });
 
-        // Data migration: ensure all submissions have IDs
-        let needsUpdate = false;
-        const validatedData = data.map((sub, index) => {
-            if (!sub.id) {
-                needsUpdate = true;
-                return { ...sub, id: `sub_legacy_${index}_${Date.now()}` };
+                setStats({ ...counts, authors: data.length }); // Simplified author count
+                setRecentSubmissions(data.slice(0, 5)); // backend already sorts DESC
+            } catch (error) {
+                console.error("Failed to fetch dashboard data:", error);
             }
-            return sub;
-        });
+        };
 
-        if (needsUpdate) {
-            localStorage.setItem('jt_submissions', JSON.stringify(validatedData));
-        }
-
-        const counts = validatedData.reduce((acc, sub) => {
-            acc.total++;
-            const status = sub.status || 'pending';
-            acc[status]++;
-            return acc;
-        }, { total: 0, pending: 0, accepted: 0, rejected: 0 });
-
-        // Derive author count from contributors
-        const authorEmails = new Set();
-        validatedData.forEach(sub => {
-            sub.contributors?.forEach(c => authorEmails.add(c.email.toLowerCase()));
-        });
-
-        setStats({ ...counts, authors: authorEmails.size });
-        setRecentSubmissions(validatedData.slice(-5).reverse());
+        fetchDashboardData();
     }, []);
 
     const cards = [
@@ -115,13 +104,13 @@ const AdminDashboard = () => {
                                     </tr>
                                 ) : (
                                     recentSubmissions.map((sub) => (
-                                        <tr key={sub.id} className="hover:bg-slate-50 transition-colors cursor-pointer group/row" onClick={() => navigate(`/admin/submissions/${sub.id}`)}>
+                                        <tr key={sub.submission_id || sub.id} className="hover:bg-slate-50 transition-colors cursor-pointer group/row" onClick={() => navigate(`/admin/submissions/${sub.submission_id || sub.id}`)}>
                                             <td className="px-6 py-4">
                                                 <p className="font-bold text-slate-800 truncate max-w-xs group-hover/row:text-blue-600 transition-colors">{sub.title}</p>
-                                                <p className="text-xs text-slate-400 mt-0.5 uppercase tracking-tighter">{sub.section}</p>
+                                                <p className="text-xs text-slate-400 mt-0.5 uppercase tracking-tighter">{sub.section_name || sub.section}</p>
                                             </td>
                                             <td className="px-6 py-4 text-slate-600 font-medium">
-                                                {sub.contributors?.[0]?.name || 'Unknown'}
+                                                {sub.main_author || 'Unknown'}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${sub.status === 'accepted' ? 'bg-emerald-50 text-emerald-600' :
@@ -132,7 +121,7 @@ const AdminDashboard = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-slate-400 text-xs">
-                                                {new Date(sub.createdAt).toLocaleDateString()}
+                                                {new Date(sub.created_at || sub.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex justify-end">
