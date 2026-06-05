@@ -58,6 +58,16 @@ export const submissionService = {
         const response = await axios.get(`${API_BASE_URL}/submissions/public/${journalId}`);
         return response.data;
     },
+    // Get all submissions (any status) for a specific journal (admin view)
+    getSubmissionsByJournal: async (journalId) => {
+        const response = await axios.get(`${API_BASE_URL}/submissions/journal/${journalId}`);
+        return response.data;
+    },
+    // Accept a submission (admin action) – simple status update
+    acceptSubmission: async (submissionId) => {
+        const response = await axios.patch(`${API_BASE_URL}/submissions/${submissionId}`, { status: 'accepted' });
+        return response.data;
+    },
     getPublicById: async (id) => {
         // Public endpoint - no auth needed
         const response = await axios.get(`${API_BASE_URL}/submissions/public/article/${id}`);
