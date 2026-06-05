@@ -11,7 +11,7 @@ export default function SubmissionPublicView() {
     useEffect(() => {
         const fetch = async () => {
             try {
-                const res = await submissionService.getById(submissionId);
+                const res = await submissionService.getPublicById(submissionId);
                 setData(res);
             } catch (e) {
                 console.error(e);

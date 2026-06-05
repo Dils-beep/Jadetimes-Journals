@@ -57,6 +57,11 @@ export const submissionService = {
         // Public endpoint - no auth needed
         const response = await axios.get(`${API_BASE_URL}/submissions/public/${journalId}`);
         return response.data;
+    },
+    getPublicById: async (id) => {
+        // Public endpoint - no auth needed
+        const response = await axios.get(`${API_BASE_URL}/submissions/public/article/${id}`);
+        return response.data;
     }
 };
 
