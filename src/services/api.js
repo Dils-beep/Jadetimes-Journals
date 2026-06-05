@@ -63,9 +63,9 @@ export const submissionService = {
         const response = await axios.get(`${API_BASE_URL}/submissions/journal/${journalId}`);
         return response.data;
     },
-    // Accept a submission (admin action) – simple status update
+    // Accept a submission (admin action) – uses authenticated api instance
     acceptSubmission: async (submissionId) => {
-        const response = await axios.patch(`${API_BASE_URL}/submissions/${submissionId}`, { status: 'accepted' });
+        const response = await api.put(`/submissions/${submissionId}/status`, { status: 'accepted', feedback: '' });
         return response.data;
     },
     getPublicById: async (id) => {

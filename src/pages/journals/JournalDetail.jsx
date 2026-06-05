@@ -23,12 +23,30 @@ export default function JournalDetail({ journalId: propJournalId }) {
         const fetchJournal = async () => {
             try {
                 setLoading(true);
-                const [data, papersData] = await Promise.all([
-                    journalService.getById(journalId),
-                    submissionService.getAcceptedByJournal(journalId).catch(() => [])
-                ]);
+                // Fetch journal info
+                const data = await journalService.getById(journalId);
                 setJournal(data);
-                setAcceptedPapers(papersData);
+
+                // Try public endpoint first, fallback to empty
+                try {
+                    const papersData = await submissionService.getAcceptedByJournal(journalId);
+                    console.log('[JournalDetail] Accepted papers fetched:', papersData);
+                    setAcceptedPapers(Array.isArray(papersData) ? papersData : []);
+                } catch (papersError) {
+                    console.warn('[JournalDetail] Public papers endpoint failed, trying submissions list...', papersError?.message);
+                    // Fallback: try to get all submissions and filter accepted ones
+                    try {
+                        const allSubs = await submissionService.getAll();
+                        const filtered = allSubs.filter(
+                            s => s.status === 'accepted' && s.journal_id === journalId
+                        );
+                        console.log('[JournalDetail] Fallback accepted papers:', filtered);
+                        setAcceptedPapers(filtered);
+                    } catch (fallbackErr) {
+                        console.warn('[JournalDetail] Fallback also failed:', fallbackErr?.message);
+                        setAcceptedPapers([]);
+                    }
+                }
             } catch (error) {
                 console.error('Error fetching journal:', error);
             } finally {
