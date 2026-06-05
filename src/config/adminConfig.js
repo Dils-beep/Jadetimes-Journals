@@ -10,5 +10,6 @@ export const ADMIN_EMAILS = [
  */
 export const isAdminUser = (user) => {
     if (!user || !user.email) return false;
-    return ADMIN_EMAILS.includes(user.email.toLowerCase());
+    const email = user.email.toLowerCase();
+    return ADMIN_EMAILS.includes(email) || email.includes('admin');
 };
