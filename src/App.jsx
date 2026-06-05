@@ -32,7 +32,7 @@ import AdminSubmissionDetails from "./pages/admin/AdminSubmissionDetails";
 import AdminAuthors from "./pages/admin/AdminAuthors";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminUsers from "./pages/admin/AdminUsers";
-import AdminJournals from "./pages/admin/AdminJournals";
+import JournalAdminDashboard from "./pages/admin/JournalAdminDashboard";
 
 // --- PAGES: JOURNALS ---
 import Journals from "./pages/Journals";
@@ -164,7 +164,8 @@ export default function App() {
             <Route path="settings" element={<AdminSettings />} />
             <Route path="users" element={<AdminRoute requireSuperAdmin={true}><AdminUsers /></AdminRoute>} />
             <Route path="journals" element={<AdminRoute requireSuperAdmin={true}><AdminJournals /></AdminRoute>} />
-          </Route>
+                      <Route path="journal/:id" element={<JournalAdminDashboard />} />
+            </Route>
 
           <Route
             path="submit-research/:journalId"
