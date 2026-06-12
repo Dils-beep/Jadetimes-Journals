@@ -131,12 +131,21 @@ export default function SubmissionPublicView() {
                         <h3 className="text-lg font-bold mb-2">Full Article</h3>
                         <p className="text-slate-400 text-sm mb-6">Read the complete research paper</p>
                         {pdfUrl ? (
-                            <button
-                                onClick={handleViewPaper}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-blue-600/30 active:scale-95"
-                            >
-                                <Download className="w-4 h-4" /> Download / Read
-                            </button>
+                            <div className="space-y-3">
+                                <a
+                                    href={pdfUrl}
+                                    download={`${submission.title}.pdf`}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-blue-600/30 active:scale-95"
+                                >
+                                    <Download className="w-4 h-4" /> Download PDF
+                                </a>
+                                <button
+                                    onClick={handleViewPaper}
+                                    className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95"
+                                >
+                                    <BookOpen className="w-4 h-4" /> View Paper
+                                </button>
+                            </div>
                         ) : (
                             <p className="text-slate-500 text-sm italic">Full text not yet available</p>
                         )}
