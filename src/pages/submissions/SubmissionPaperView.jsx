@@ -41,9 +41,12 @@ export default function SubmissionPaperView() {
     const pdfFile = submission_files?.find(f =>
         f.file_type === 'application/pdf' || f.file_name?.endsWith('.pdf')
     );
-    const pdfUrl = pdfFile
-        ? `${BASE_URL}/${pdfFile.file_path.replace(/\\/g, '/')}`
+    const anyFile = pdfFile || (submission_files?.length > 0 ? submission_files[0] : null);
+    const fileUrl = anyFile
+        ? `${BASE_URL}/${anyFile.file_path.replace(/\\/g, '/')}`
         : null;
+    const fileName = anyFile?.file_name || `${submission.title}`;
+    const isPdf = anyFile?.file_type === 'application/pdf' || anyFile?.file_name?.endsWith('.pdf');
 
     const authorNames = contributors?.map(c => c.name).join(', ') || 'Unknown Author';
     const publishedDate = new Date(submission.created_at).toLocaleDateString('en-US', {
@@ -62,13 +65,13 @@ export default function SubmissionPaperView() {
                     <span className="font-semibold text-sm truncate max-w-[400px]">{submission.title}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                    {pdfUrl && (
+                    {fileUrl && (
                         <a
-                            href={pdfUrl}
-                            download={`${submission.title}.pdf`}
+                            href={fileUrl}
+                            download={fileName}
                             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg text-sm font-bold transition-colors"
                         >
-                            <Download className="w-4 h-4" /> Download PDF
+                            <Download className="w-4 h-4" /> Download {isPdf ? 'PDF' : 'Paper'}
                         </a>
                     )}
                     <button
@@ -200,23 +203,36 @@ export default function SubmissionPaperView() {
                             </section>
                         )}
 
-                        {/* Uploaded PDF Embed */}
-                        {pdfUrl && (
+                        {/* Uploaded File Embed */}
+                        {fileUrl && isPdf && (
                             <section className="mb-10">
                                 <h2 className="text-[13px] font-black uppercase tracking-[0.18em] text-slate-900 mb-4 border-b border-slate-200 pb-2">
                                     Full Text (Uploaded Manuscript)
                                 </h2>
                                 <div className="no-print bg-slate-50 border border-slate-200 rounded-lg overflow-hidden" style={{ height: '700px' }}>
                                     <iframe
-                                        src={`${pdfUrl}#view=FitH`}
+                                        src={`${fileUrl}#view=FitH`}
                                         className="w-full h-full"
                                         title="Research Paper"
                                         frameBorder="0"
                                     />
                                 </div>
                                 <p className="print-only text-[12px] text-slate-500 italic mt-2">
-                                    Full manuscript available at: {pdfUrl}
+                                    Full manuscript available at: {fileUrl}
                                 </p>
+                            </section>
+                        )}
+                        {fileUrl && !isPdf && (
+                            <section className="mb-10">
+                                <h2 className="text-[13px] font-black uppercase tracking-[0.18em] text-slate-900 mb-4 border-b border-slate-200 pb-2">
+                                    Full Text (Uploaded Manuscript)
+                                </h2>
+                                <div className="bg-slate-50 border border-slate-200 rounded-xl p-8 text-center">
+                                    <p className="text-slate-600 mb-4">This manuscript is available for download.</p>
+                                    <a href={fileUrl} download={fileName} className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-colors">
+                                        <Download className="w-4 h-4" /> Download Manuscript
+                                    </a>
+                                </div>
                             </section>
                         )}
 

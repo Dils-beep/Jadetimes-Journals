@@ -36,11 +36,15 @@ export default function SubmissionPublicView() {
     );
 
     const { submission, submission_files, contributors } = data;
+    // Try PDF first, then any file
     const pdfFile = submission_files?.find(f => f.file_type === 'application/pdf' || f.file_name?.endsWith('.pdf'));
-    const pdfUrl = pdfFile ? `${BASE_URL}/${pdfFile.file_path.replace(/\\/g, '/')}` : null;
+    const anyFile = pdfFile || (submission_files?.length > 0 ? submission_files[0] : null);
+    const fileUrl = anyFile ? `${BASE_URL}/${anyFile.file_path.replace(/\\/g, '/')}` : null;
+    const fileName = anyFile?.file_name || `${submission.title}`;
+    const isPdf = anyFile?.file_type === 'application/pdf' || anyFile?.file_name?.endsWith('.pdf');
 
     const handleViewPaper = () => {
-        if (pdfUrl) {
+        if (fileUrl) {
             window.open(`/paper-view/${submissionId}`, '_blank');
         }
     };
@@ -130,14 +134,14 @@ export default function SubmissionPublicView() {
                         <FileText className="w-12 h-12 mx-auto mb-4 text-blue-400" />
                         <h3 className="text-lg font-bold mb-2">Full Article</h3>
                         <p className="text-slate-400 text-sm mb-6">Read the complete research paper</p>
-                        {pdfUrl ? (
+                        {fileUrl ? (
                             <div className="space-y-3">
                                 <a
-                                    href={pdfUrl}
-                                    download={`${submission.title}.pdf`}
+                                    href={fileUrl}
+                                    download={fileName}
                                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-blue-600/30 active:scale-95"
                                 >
-                                    <Download className="w-4 h-4" /> Download PDF
+                                    <Download className="w-4 h-4" /> Download {isPdf ? 'PDF' : 'Paper'}
                                 </a>
                                 <button
                                     onClick={handleViewPaper}
